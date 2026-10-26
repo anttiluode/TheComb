@@ -1,0 +1,483 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Comb</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a cutting lathe — the disc on the left, its control plate on the right; the borrowed-paper bench and the ledger below. */
+:root{
+  --bg:#eceef1; --surface:#fbfbfc; --disc:#e1e4e9; --ink:#1a1c21; --muted:#5b6370; --line:#cdd2da;
+  --accent:#b05f1c; --cool:#356a98; --ok:#2c7a4b; --bad:#b03636; --groove:#9aa3af;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111217; --surface:#191b21; --disc:#0b0c10; --ink:#e7e8eb; --muted:#9aa1ac; --line:#2b2f37;
+  --accent:#e59a4e; --cool:#71a6d8; --ok:#62c08a; --bad:#e46b6b; --groove:#3b404a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111217; --surface:#191b21; --disc:#0b0c10; --ink:#e7e8eb; --muted:#9aa1ac; --line:#2b2f37;
+  --accent:#e59a4e; --cool:#71a6d8; --ok:#62c08a; --bad:#e46b6b; --groove:#3b404a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:40px}
+h1,h2{font-family:var(--f-display);font-weight:800;letter-spacing:.01em;line-height:1;text-wrap:balance;margin:0}
+h1{font-size:clamp(44px,7vw,76px);text-transform:uppercase}
+h2{font-size:clamp(28px,3.6vw,38px);text-transform:uppercase}
+h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+p{margin:0;max-width:66ch}
+.lede{display:flex;flex-direction:column;gap:12px}
+.lede p{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+section{display:flex;flex-direction:column;gap:18px}
+.lathe{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.lathe{grid-template-columns:minmax(0,1fr)}}
+.discbox{background:var(--disc);border-radius:14px;padding:10px;position:relative}
+canvas#disc{width:100%;aspect-ratio:1/1;display:block;cursor:crosshair;max-width:100%}
+.disc-caption{position:absolute;left:18px;bottom:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted);pointer-events:none}
+.plate{display:flex;flex-direction:column;gap:18px;min-width:0}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{flex:1;padding:10px 8px;border:0;background:transparent;color:var(--muted);font:600 13px var(--f-body);text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.ctl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+@media (max-width:420px){.ctl{grid-template-columns:minmax(0,1fr)}}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.field label .mono{color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:500 13px var(--f-body);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.readout{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.stat .v{font-family:var(--f-mono);font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.sheets{width:100%;border-collapse:collapse;font-size:13px}
+.sheets td,.sheets th{padding:3px 6px;text-align:left;border-bottom:1px solid var(--line)}
+.sheets th{font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.sheets td.mono{font-size:12.5px}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .mut{color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+.stack{font-family:var(--f-mono);font-size:12.5px;display:flex;flex-direction:column;gap:2px;min-height:6em}
+.stack div{white-space:pre;overflow-x:auto}
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.bench{grid-template-columns:minmax(0,1fr)}}
+.regs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.reg{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;transition:background .25s}
+.reg .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.reg .v{font-family:var(--f-mono);font-size:24px;font-variant-numeric:tabular-nums}
+.reg.flash{background:color-mix(in srgb,var(--accent) 22%,var(--surface))}
+.wheelrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+canvas#wheel{width:120px;height:120px;flex:none}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.log{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+.log th,.log td{padding:5px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.log th{font-family:var(--f-body);font-weight:500;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.log td:first-child,.log th:first-child{text-align:left}
+.verdict{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.ledger{width:100%;border-collapse:collapse;font-size:14px}
+.ledger th,.ledger td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.ledger th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500}
+.ledger td.mono{white-space:nowrap}
+@media (prefers-reduced-motion: reduce){.reg{transition:none}}
+[hidden]{display:none!important}
+</style>
+
+<div class="wrap">
+  <header class="lede">
+    <h1>The Comb</h1>
+    <p>Each comb is one layer: a row of teeth with fixed strengths. As it turns, it rests on the sheet below, sums tooth strength times groove depth, and cuts a groove on the next sheet with that pressure. If the pressure comes out negative, the stylus lifts and nothing is cut. That lift is ReLU. Stack the combs and you have a convolutional network, cut ring by ring.</p>
+  </header>
+
+  <section aria-labelledby="h-lathe">
+    <h2 id="h-lathe">The lathe</h2>
+    <div class="lathe">
+      <div class="discbox">
+        <canvas id="disc" aria-label="Concentric sheets of paper with combs cutting grooves"></canvas>
+        <div class="disc-caption" id="disc-caption">innermost ring: the input record</div>
+      </div>
+
+      <div class="plate">
+        <div class="seg" role="group" aria-label="Mode">
+          <button id="mode-spin" aria-pressed="true">Spin · keep every sheet</button>
+          <button id="mode-regrow" aria-pressed="false">Regrow · Williams</button>
+        </div>
+
+        <div class="ctl">
+          <div class="field"><label for="sel-input">Input record</label>
+            <select id="sel-input"><option value="bumps">Three bumps</option><option value="sine">Two sines</option><option value="spike">One spike</option><option value="noise">Noise</option></select></div>
+          <div class="field"><label for="rng-levels">Combs (depth) <span class="mono" id="o-levels">5</span></label><input id="rng-levels" type="range" min="2" max="6" step="1" value="5"></div>
+          <div class="field"><label for="rng-teeth">Teeth per comb <span class="mono" id="o-teeth">5</span></label><input id="rng-teeth" type="range" min="3" max="9" step="2" value="5"></div>
+          <div class="field"><label for="rng-spacing">Tooth spacing <span class="mono" id="o-spacing">2</span></label><input id="rng-spacing" type="range" min="1" max="6" step="1" value="2"></div>
+          <div class="field"><label for="rng-bias">Stylus bias <span class="mono" id="o-bias">−0.05</span></label><input id="rng-bias" type="range" min="-50" max="50" step="1" value="-5"></div>
+          <div class="field" id="f-speed"><label for="rng-speed">Spin speed <span class="mono" id="o-speed">12</span></label><input id="rng-speed" type="range" min="0" max="60" step="1" value="12"></div>
+          <div class="field" id="f-steps" hidden><label for="rng-steps">Presses per frame <span class="mono" id="o-steps">4</span></label><input id="rng-steps" type="range" min="0" max="12" step="1" value="2"></div>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="chk-shared"> Same comb on every level</label>
+          <button class="btn" id="btn-reroll">New tooth strengths</button>
+        </div>
+
+        <div id="spin-panel" class="readout">
+          <div class="row"><button class="btn primary" id="btn-play">Pause</button><button class="btn" id="btn-blank">Blank the paper</button></div>
+          <div class="stats">
+            <div class="stat"><span class="k">Paper held</span><span class="v" id="s-paper">–</span></div>
+            <div class="stat"><span class="k">Presses</span><span class="v" id="s-presses">0</span></div>
+            <div class="stat"><span class="k">Revolutions</span><span class="v" id="s-revs">0</span></div>
+          </div>
+          <table class="sheets"><thead><tr><th>Sheet</th><th>Crushed to 0</th><th>Matches a full pass</th></tr></thead><tbody id="sheet-rows"></tbody></table>
+          <p class="note">Blank the paper and watch the grooves settle outward. Sheet 2 is only right once sheet 1 is, so depth costs revolutions.</p>
+        </div>
+
+        <div id="regrow-panel" class="readout" hidden>
+          <div class="row"><button class="btn primary" id="btn-run">Run</button><button class="btn" id="btn-step">One press</button><button class="btn" id="btn-restart">Restart</button></div>
+          <p class="note">Nothing is kept but the input record. Click any groove on the disc to ask for it; each comb regrows the grooves it needs from the record, one tooth at a time, then forgets them.</p>
+          <div class="stats">
+            <div class="stat"><span class="k">Presses</span><span class="v" id="r-presses">0</span></div>
+            <div class="stat"><span class="k">Held now / peak</span><span class="v" id="r-held">0 / 0</span></div>
+            <div class="stat"><span class="k">Grooves regrown</span><span class="v" id="r-regrown">0</span></div>
+          </div>
+          <h3>Bookmarks, one per comb</h3>
+          <div class="stack" id="r-stack"></div>
+          <div class="verdict" id="r-verdict"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-bench">
+    <h2 id="h-bench">Borrowed paper</h2>
+    <p>The trick inside Williams' proof, run exactly. Three registers are already full of someone else's grooves. We need P(v) for a polynomial P, and we have nowhere clean to write v. So we write v on top of the junk, rotated through m = 8 phases, evaluate P each time and add the results. Every power of the junk picks up a phase that sums to zero around the wheel. Only P(v) survives, and each register is handed back exactly as it was. Arithmetic is in the finite field of 257 elements, so nothing is rounded.</p>
+    <div class="bench">
+      <div class="plate">
+        <h3>Registers (what's on the borrowed paper now)</h3>
+        <div class="regs" id="cm-regs"></div>
+        <h3>What we want to feed in, v</h3>
+        <div class="regs" id="cm-v"></div>
+        <div class="field"><label for="rng-deg">Degree of P <span class="mono" id="o-deg">5</span></label><input id="rng-deg" type="range" min="1" max="12" step="1" value="5"></div>
+        <p class="note mono" id="cm-poly"></p>
+        <div class="row"><button class="btn primary" id="cm-step">Next phase</button><button class="btn" id="cm-run">Run all 8</button><button class="btn" id="cm-new">New junk</button></div>
+      </div>
+      <div class="plate">
+        <div class="wheelrow">
+          <canvas id="wheel" width="240" height="240" aria-label="Phase wheel with 8 spokes"></canvas>
+          <div class="verdict" id="cm-verdict"></div>
+        </div>
+        <div class="tablebox"><table class="log"><thead><tr><th>phase i</th><th>ωⁱ</th><th>P sees</th><th>P(…)</th><th>running sum</th></tr></thead><tbody id="cm-log"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-ledger">
+    <h2 id="h-ledger">The ledger</h2>
+    <p>The same groove, three schedules. Numbers follow the lathe settings above, for one groove on the outermost sheet.</p>
+    <div class="tablebox">
+      <table class="ledger">
+        <thead><tr><th>Schedule</th><th>Paper held at once</th><th>Presses for one groove</th><th>What it costs you</th></tr></thead>
+        <tbody>
+          <tr><td>Keep every sheet</td><td class="mono" id="l-keep-p">–</td><td class="mono" id="l-keep-t">–</td><td>Paper grows with depth. Every intermediate groove sits on its own sheet.</td></tr>
+          <tr><td>Regrow, depth first</td><td class="mono" id="l-dfs-p">–</td><td class="mono" id="l-dfs-t">–</td><td>Presses grow as teeth to the power of depth. This comb's rule is a running sum, so each level holds one running number.</td></tr>
+          <tr><td>Cook–Mertz, general rule</td><td class="mono" id="l-cm-p">–</td><td class="mono" id="l-cm-t">more still</td><td>For a rule that needs all its inputs at once, each level would hold d values of b bits. Cook–Mertz folds those levels into one shared register set, plus a small bookmark per level. Each node's rule must first be rewritten as a polynomial, and for a b-bit rule that costs about 2ᵇ.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The combs never change. Williams changes the schedule: which grooves stay on paper and which are cut again when needed. Every saving in paper is paid for in turns of the lathe.</p>
+  </section>
+</div>
+
+<script>
+(()=>{
+"use strict";
+const $=id=>document.getElementById(id);
+const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const css=()=>{const s=getComputedStyle(document.documentElement);const g=n=>s.getPropertyValue(n).trim();
+  return {disc:g("--disc"),ink:g("--ink"),muted:g("--muted"),line:g("--line"),accent:g("--accent"),cool:g("--cool"),ok:g("--ok"),bad:g("--bad"),groove:g("--groove"),surface:g("--surface"),mono:g("--f-mono")};};
+
+/* ---------- the machine ---------- */
+const N=96;
+const S={L:5,K:5,dil:2,bias:-0.05,shared:false,seed:7,input:"bumps",speed:12,mode:"spin"};
+const mod=(a,n)=>((a%n)+n)%n;
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=0,v=0;while(u===0)u=r();v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+let W=[],off=[],input=new Float64Array(N),ref=[];
+function buildWeights(){
+  W=[null];
+  for(let l=1;l<=S.L;l++){
+    if(S.shared&&l>1){W.push(W[1]);continue;}
+    const r=rng(S.seed*1000+l*17);const w=[];let sa=0;
+    for(let k=0;k<S.K;k++){const x=gauss(r)+1.2;w.push(x);sa+=Math.abs(x);}
+    W.push(w.map(x=>x*1.4/sa));
+  }
+}
+function buildOffsets(){off=[];const c=(S.K-1)/2;for(let k=0;k<S.K;k++)off.push((k-c)*S.dil);}
+function buildInput(){
+  const r=rng(S.seed*31+3);
+  for(let i=0;i<N;i++){const a=i/N*2*Math.PI;let v=0;
+    if(S.input==="sine")v=0.7*Math.sin(3*a)+0.35*Math.sin(7*a+0.6);
+    else if(S.input==="spike")v=i===12?1:0;
+    else if(S.input==="noise")v=r()*2-1;
+    input[i]=v;}
+  if(S.input==="bumps"){const cs=[[8,1],[40,-0.8],[66,0.9]];
+    for(let i=0;i<N;i++){let v=0;for(const [c,amp] of cs){const d=Math.min(mod(i-c,N),mod(c-i,N));v+=amp*Math.exp(-d*d/18);}input[i]=v;}}
+}
+/* one groove: identical order of operations everywhere so results match bit for bit */
+function cut(l,i,below){let s=0;const w=W[l];for(let k=0;k<S.K;k++)s+=w[k]*below[mod(i+off[k],N)];const pre=s+S.bias;return [pre>0?pre:0,pre];}
+function forward(){ref=[Float64Array.from(input)];for(let l=1;l<=S.L;l++){const r=new Float64Array(N);for(let i=0;i<N;i++)r[i]=cut(l,i,ref[l-1])[0];ref.push(r);}}
+function scaleOf(l){let m=0;const r=ref[l];for(let i=0;i<N;i++)m=Math.max(m,Math.abs(r[i]));return m||1;}
+
+/* ---------- spin mode state ---------- */
+let rings=[],pos=0,lastIdx=[],presses=0,playing=!reduce,lastPre=[];
+function resetRings(fromRef){rings=[];for(let l=0;l<=S.L;l++)rings.push(fromRef?Float64Array.from(ref[l]):new Float64Array(N));rings[0]=Float64Array.from(input);
+  lastIdx=[];lastPre=[];for(let l=0;l<=S.L;l++){lastIdx.push(combCell(l));lastPre.push(0);}}
+function combCell(l){return mod(Math.floor(pos)-l*7,N);}
+
+/* ---------- regrow mode state ---------- */
+let R=null;
+function startRegrow(target){
+  const t=target||(R&&R.target)||{l:S.L,i:0};
+  if(t.l>S.L)t.l=S.L;
+  const disp=[],heat=[];for(let l=0;l<=S.L;l++){disp.push(new Float64Array(N));heat.push(new Float32Array(N));}
+  R={target:t,stack:[{l:t.l,i:t.i,k:0,acc:0}],presses:0,peak:1,regrown:0,done:false,result:null,disp,heat,running:R?R.running:false,carry:0};
+}
+function regrowStep(){
+  if(!R||R.done)return;
+  const st=R.stack,top=st[st.length-1];
+  if(top.k<S.K){
+    const j=mod(top.i+off[top.k],N);
+    if(top.l-1===0){top.acc+=W[top.l][top.k]*input[j];top.k++;R.presses++;R.heat[0][j]=1;}
+    else{st.push({l:top.l-1,i:j,k:0,acc:0});if(st.length>R.peak)R.peak=st.length;}
+  }else{
+    const pre=top.acc+S.bias,v=pre>0?pre:0;st.pop();
+    R.disp[top.l][top.i]=v;R.heat[top.l][top.i]=1;R.regrown++;
+    if(!st.length){R.done=true;R.result=v;R.running=false;return;}
+    const p=st[st.length-1];p.acc+=W[p.l][p.k]*v;p.k++;R.presses++;
+  }
+}
+const dfsTotal=l=>{let t=0,p=1;for(let d=0;d<l;d++){p*=S.K;t+=p;}return t;};
+
+/* ---------- drawing ---------- */
+const cv=$("disc"),ctx=cv.getContext("2d");let CW=600,DPR=1;
+function sizeCanvas(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);CW=Math.max(200,r.width);cv.width=Math.round(CW*DPR);cv.height=Math.round(CW*DPR);}
+new ResizeObserver(sizeCanvas).observe(cv);
+const geo=()=>{const R0=CW/2;const r0=R0*0.2,rmax=R0*0.93;return{cx:R0,cy:R0,r0,dr:(rmax-r0)/S.L};};
+const ang=i=>i/N*2*Math.PI-Math.PI/2;
+function drawRing(g,l,vals,col,alphaArr){
+  const r=g.r0+l*g.dr,C=css();
+  ctx.strokeStyle=C.groove;ctx.lineWidth=1;ctx.beginPath();ctx.arc(g.cx,g.cy,r,0,2*Math.PI);ctx.stroke();
+  const sc=scaleOf(l),len=g.dr*0.5;
+  for(let i=0;i<N;i++){const v=vals[i],a=ang(i),ca=Math.cos(a),sa=Math.sin(a);
+    const al=alphaArr?alphaArr[i]:1;if(al<0.02)continue;
+    if(Math.abs(v)<1e-12){ctx.globalAlpha=0.55*al;ctx.fillStyle=C.muted;ctx.beginPath();ctx.arc(g.cx+ca*r,g.cy+sa*r,1.1,0,2*Math.PI);ctx.fill();continue;}
+    const L=Math.max(1.5,Math.abs(v)/sc*len)*(v<0?-1:1);
+    ctx.globalAlpha=al;ctx.strokeStyle=v<0?C.cool:col;ctx.lineWidth=Math.max(1.6,CW/N*0.035*Math.PI*(0.6+l*0.25));
+    ctx.beginPath();ctx.moveTo(g.cx+ca*r,g.cy+sa*r);ctx.lineTo(g.cx+ca*(r+L),g.cy+sa*(r+L));ctx.stroke();}
+  ctx.globalAlpha=1;
+}
+function drawComb(g,l,i,pressing,activeK){
+  const C=css(),rb=g.r0+(l-1)*g.dr,rs=rb+g.dr*0.62,rt=g.r0+l*g.dr;
+  const w=W[l];let mx=0;for(const x of w)mx=Math.max(mx,Math.abs(x));
+  const js=off.map(o=>i+o);
+  // spine
+  ctx.strokeStyle=C.ink;ctx.globalAlpha=0.8;ctx.lineWidth=2;ctx.beginPath();
+  ctx.arc(g.cx,g.cy,rs,ang(js[0]),ang(js[js.length-1]));ctx.stroke();
+  for(let k=0;k<S.K;k++){const a=ang(js[k]),ca=Math.cos(a),sa=Math.sin(a);
+    const tl=g.dr*(0.18+0.32*Math.abs(w[k])/mx);
+    ctx.globalAlpha=activeK==null||activeK===k?1:0.35;
+    ctx.strokeStyle=C.ink;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(g.cx+ca*rs,g.cy+sa*rs);ctx.lineTo(g.cx+ca*(rb+tl),g.cy+sa*(rb+tl));ctx.stroke();
+    ctx.strokeStyle=w[k]>0?C.accent:C.cool;ctx.lineWidth=activeK===k?4:3;ctx.beginPath();ctx.moveTo(g.cx+ca*(rb+tl),g.cy+sa*(rb+tl));ctx.lineTo(g.cx+ca*(rb+2),g.cy+sa*(rb+2));ctx.stroke();}
+  ctx.globalAlpha=1;
+  // stylus
+  const a=ang(i),ca=Math.cos(a),sa=Math.sin(a);
+  if(pressing){ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(g.cx+ca*rs,g.cy+sa*rs);ctx.lineTo(g.cx+ca*(rt-1),g.cy+sa*(rt-1));ctx.stroke();
+    ctx.fillStyle=C.accent;ctx.beginPath();ctx.arc(g.cx+ca*rt,g.cy+sa*rt,3.2,0,2*Math.PI);ctx.fill();}
+  else{ctx.strokeStyle=C.muted;ctx.lineWidth=2;ctx.setLineDash([3,3]);const re=rs+(rt-rs)*0.45;ctx.beginPath();ctx.moveTo(g.cx+ca*rs,g.cy+sa*rs);ctx.lineTo(g.cx+ca*re,g.cy+sa*re);ctx.stroke();ctx.setLineDash([]);}
+}
+function labels(g){const C=css();ctx.fillStyle=C.muted;ctx.font=`${Math.max(10,CW*0.018)}px ${C.mono}`;ctx.textAlign="right";
+  for(let l=0;l<=S.L;l++){const r=g.r0+l*g.dr;ctx.fillText(l===0?"record":"sheet "+l,g.cx-8,g.cy-r+4+(l===0?-6:0));}}
+function draw(){
+  const g=geo(),C=css();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,CW,CW);
+  // spindle
+  ctx.fillStyle=C.surface;ctx.beginPath();ctx.arc(g.cx,g.cy,g.r0*0.55,0,2*Math.PI);ctx.fill();
+  ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(g.cx,g.cy,3,0,2*Math.PI);ctx.fill();
+  if(S.mode==="spin"){
+    drawRing(g,0,rings[0],C.ink);
+    for(let l=1;l<=S.L;l++)drawRing(g,l,rings[l],C.accent);
+    for(let l=1;l<=S.L;l++)drawComb(g,l,lastIdx[l],lastPre[l]>0,null);
+  }else{
+    const h0=R.heat[0];const a0=new Float32Array(N);for(let i=0;i<N;i++)a0[i]=0.45+0.55*h0[i];
+    drawRing(g,0,input,C.ink,a0);
+    for(let l=1;l<=S.L;l++){const al=new Float32Array(N);for(let i=0;i<N;i++)al[i]=R.heat[l][i]*0.95;drawRing(g,l,R.disp[l],C.accent,al);}
+    // target marker
+    const t=R.target,rt=g.r0+t.l*g.dr,a=ang(t.i);
+    ctx.strokeStyle=R.done?C.ok:C.accent;ctx.lineWidth=2;ctx.beginPath();ctx.arc(g.cx+Math.cos(a)*rt,g.cy+Math.sin(a)*rt,9,0,2*Math.PI);ctx.stroke();
+    for(const f of R.stack)drawComb(g,f.l,f.i,(f.acc+S.bias)>0,f.k<S.K?f.k:null);
+    if(R.done){ctx.fillStyle=C.ok;ctx.beginPath();ctx.arc(g.cx+Math.cos(a)*rt,g.cy+Math.sin(a)*rt,4,0,2*Math.PI);ctx.fill();}
+  }
+  labels(g);
+}
+
+/* ---------- readouts ---------- */
+const fmt=n=>n.toLocaleString("en-US");
+function spinReadout(){
+  $("s-paper").textContent=fmt((S.L+1)*N);
+  $("s-presses").textContent=fmt(presses);
+  $("s-revs").textContent=(pos/N).toFixed(1);
+  let html="";
+  for(let l=1;l<=S.L;l++){let z=0,dev=0;for(let i=0;i<N;i++){if(rings[l][i]===0)z++;dev=Math.max(dev,Math.abs(rings[l][i]-ref[l][i]));}
+    const okk=dev===0;
+    html+=`<tr><td>${l}</td><td class="mono">${(100*z/N).toFixed(0)}%</td><td class="mono ${okk?"ok":"mut"}">${okk?"yes":"not yet"}</td></tr>`;}
+  $("sheet-rows").innerHTML=html;
+}
+function regrowReadout(){
+  $("r-presses").textContent=fmt(R.presses)+" / "+fmt(dfsTotal(R.target.l));
+  $("r-held").textContent=R.stack.length+" / "+R.peak;
+  $("r-regrown").textContent=fmt(R.regrown);
+  $("r-stack").innerHTML=R.stack.slice().reverse().map(f=>`<div>comb ${f.l}  groove ${String(f.i).padStart(2," ")}  tooth ${Math.min(f.k+1,S.K)}/${S.K}  sum ${f.acc>=0?" ":""}${f.acc.toFixed(4)}</div>`).join("")||`<div class="mut">empty: finished</div>`;
+  const keepT=R.target.l*N*S.K;
+  let v=`<span class="mut">Asking for groove ${R.target.i} on sheet ${R.target.l}. Keeping every sheet would hold ${fmt((R.target.l+1)*N)} grooves and take ${fmt(keepT)} presses.</span>`;
+  if(R.done){const truth=ref[R.target.l][R.target.i];const same=truth===R.result;
+    v=`<span class="${same?"ok":"bad"}">Regrown depth ${R.result.toFixed(6)}. Full pass with every sheet kept: ${truth.toFixed(6)}. ${same?"Identical, bit for bit.":"Mismatch."}</span>`+
+      `<span class="mut">Paper held at most ${R.peak} running sums plus their bookmarks, instead of ${fmt((R.target.l+1)*N)} grooves. Presses: ${fmt(R.presses)} instead of ${fmt(keepT)}.</span>`;}
+  $("r-verdict").innerHTML=v;
+  $("btn-run").textContent=R.running?"Pause":(R.done?"Done":"Run");
+}
+function ledger(){
+  const l=S.L;
+  $("l-keep-p").textContent=fmt((l+1)*N)+" grooves";
+  $("l-keep-t").textContent=fmt(l*N*S.K);
+  $("l-dfs-p").textContent=`record + ${l} sums + ${l} bookmarks`;
+  $("l-dfs-t").textContent=fmt(dfsTotal(l))+` (≈ ${S.K}^${l})`;
+  $("l-cm-p").textContent=`record + 1 register set + ${l} bookmarks`;
+}
+
+/* ---------- loop ---------- */
+let tPrev=performance.now();
+function frame(t){
+  const dt=Math.min(0.1,(t-tPrev)/1000);tPrev=t;
+  if(S.mode==="spin"){
+    if(playing&&S.speed>0){
+      pos+=S.speed*dt;
+      rings[0]=Float64Array.from(input);
+      for(let l=1;l<=S.L;l++){const target=combCell(l);let c=lastIdx[l],guard=0;
+        while(c!==target&&guard<N){c=mod(c+1,N);const [v,pre]=cut(l,c,rings[l-1]);rings[l][c]=v;lastPre[l]=pre;presses+=S.K;guard++;}
+        lastIdx[l]=target;}
+    }
+    spinReadout();
+  }else{
+    if(R.running){const n=Math.round(Math.pow(2,S.stepsExp))/ (S.stepsExp===0?4:1);R.carry+=n;while(R.carry>=1&&!R.done){regrowStep();R.carry-=1;}}
+    for(let l=0;l<=S.L;l++){const h=R.heat[l];for(let i=0;i<N;i++)h[i]*=(l===0?0.9:0.985);}
+    if(R.done){R.heat[R.target.l][R.target.i]=1;}
+    regrowReadout();
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- controls ---------- */
+S.stepsExp=2;
+function rebuild(keepPaper){
+  buildWeights();buildOffsets();buildInput();forward();
+  if(S.mode==="spin"){if(!keepPaper||rings.length!==S.L+1)resetRings(true);else{rings[0]=Float64Array.from(input);}}
+  else startRegrow();
+  ledger();
+}
+function bindRange(id,out,fn,show){const el=$(id);const upd=()=>{const v=+el.value;fn(v);$(out).textContent=show?show(v):v;};el.addEventListener("input",upd);upd();}
+bindRange("rng-levels","o-levels",v=>{S.L=v;},null);
+bindRange("rng-teeth","o-teeth",v=>{S.K=v;},null);
+bindRange("rng-spacing","o-spacing",v=>{S.dil=v;},null);
+bindRange("rng-bias","o-bias",v=>{S.bias=v/100;},v=>(v<0?"−":"")+Math.abs(v/100).toFixed(2));
+bindRange("rng-speed","o-speed",v=>{S.speed=v;},null);
+bindRange("rng-steps","o-steps",v=>{S.stepsExp=v;},v=>v===0?"¼":String(Math.pow(2,v)));
+["rng-levels","rng-teeth","rng-spacing","rng-bias"].forEach(id=>$(id).addEventListener("input",()=>rebuild(true)));
+$("sel-input").addEventListener("change",e=>{S.input=e.target.value;rebuild(true);});
+$("chk-shared").addEventListener("change",e=>{S.shared=e.target.checked;rebuild(true);});
+$("btn-reroll").addEventListener("click",()=>{S.seed++;rebuild(true);});
+$("btn-play").addEventListener("click",()=>{playing=!playing;$("btn-play").textContent=playing?"Pause":"Spin";});
+$("btn-blank").addEventListener("click",()=>{resetRings(false);presses=0;pos=0;for(let l=0;l<=S.L;l++)lastIdx[l]=combCell(l);playing=true;$("btn-play").textContent="Pause";if(S.speed===0){S.speed=12;$("rng-speed").value=12;$("o-speed").textContent="12";}});
+$("btn-run").addEventListener("click",()=>{if(R.done)return;R.running=!R.running;});
+$("btn-step").addEventListener("click",()=>{R.running=false;regrowStep();});
+$("btn-restart").addEventListener("click",()=>{R.running=false;startRegrow(R.target);});
+function setMode(m){S.mode=m;$("mode-spin").setAttribute("aria-pressed",m==="spin");$("mode-regrow").setAttribute("aria-pressed",m==="regrow");
+  $("spin-panel").hidden=m!=="spin";$("regrow-panel").hidden=m!=="regrow";$("f-speed").hidden=m!=="spin";$("f-steps").hidden=m!=="regrow";
+  $("disc-caption").textContent=m==="spin"?"innermost ring: the input record":"click a groove to regrow it";
+  if(m==="spin"){resetRings(true);}else{startRegrow({l:S.L,i:0});R.running=!reduce;}}
+$("mode-spin").addEventListener("click",()=>setMode("spin"));
+$("mode-regrow").addEventListener("click",()=>setMode("regrow"));
+cv.addEventListener("click",e=>{if(S.mode!=="regrow")return;const r=cv.getBoundingClientRect(),g=geo();
+  const x=e.clientX-r.left-g.cx,y=e.clientY-r.top-g.cy;const rad=Math.hypot(x,y);
+  let l=Math.round((rad-g.r0)/g.dr);if(l<1||l>S.L)return;
+  let a=Math.atan2(y,x)+Math.PI/2;a=mod(a,2*Math.PI);const i=mod(Math.round(a/(2*Math.PI)*N),N);
+  startRegrow({l,i});R.running=true;});
+
+/* ---------- borrowed paper: Cook–Mertz in GF(257) ---------- */
+const P=257,M=8;
+const pw=(a,e)=>{let r=1;a=mod(a,P);while(e>0){if(e&1)r=r*a%P;a=a*a%P;e>>=1;}return r;};
+const inv=a=>pw(a,P-2);
+let OMEGA=0;for(let g=2;g<P;g++){if(pw(g,8)===1&&pw(g,4)!==1){OMEGA=g;break;}}
+const CM={deg:5,seed:3,junk:[0,0,0],v:[0,0,0],orig:[0,0,0],regs:[0,0,0],acc:0,i:0,mons:[],rows:[],done:false};
+function cmBuild(){
+  const r=rng(CM.seed*97+CM.deg);
+  CM.junk=[0,1,2].map(()=>1+Math.floor(r()*256));CM.v=[0,1,2].map(()=>Math.floor(r()*257));
+  CM.orig=CM.junk.slice();CM.regs=CM.junk.slice();CM.acc=0;CM.i=0;CM.rows=[];CM.done=false;
+  CM.mons=[];for(let a=0;a<=CM.deg;a++)for(let b=0;a+b<=CM.deg;b++)for(let c=0;a+b+c<=CM.deg;c++){let co=Math.floor(r()*257);if(a+b+c===CM.deg&&co===0)co=1;CM.mons.push([a,b,c,co]);}
+}
+const evalP=z=>{let s=0;for(const [a,b,c,co] of CM.mons)s=(s+co*pw(z[0],a)%P*pw(z[1],b)%P*pw(z[2],c))%P;return s;};
+function cmStep(){
+  if(CM.done)return;
+  const wi=pw(OMEGA,CM.i);
+  const seen=CM.regs.map((x,k)=>(wi*x+CM.v[k])%P);   // write v on top of the rotated junk
+  const pv=evalP(seen);CM.acc=(CM.acc+pv)%P;
+  const winv=inv(wi);CM.regs=seen.map((x,k)=>mod(x-CM.v[k],P)*winv%P); // take v back off, unrotate
+  CM.rows.push([CM.i,wi,seen,pv,CM.acc]);CM.i++;
+  if(CM.i===M)CM.done=true;
+  flashRegs();
+}
+function flashRegs(){document.querySelectorAll("#cm-regs .reg").forEach(el=>{el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),260);});}
+function cmRender(){
+  $("cm-regs").innerHTML=CM.regs.map((x,k)=>`<div class="reg"><span class="k">x̂${"₁₂₃"[k]}</span><span class="v">${x}</span></div>`).join("");
+  $("cm-v").innerHTML=CM.v.map((x,k)=>`<div class="reg"><span class="k">v${"₁₂₃"[k]}</span><span class="v">${x}</span></div>`).join("");
+  const sup=n=>String(n).split("").map(d=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[+d]).join("");
+  const mono=(a,b,c)=>[[a,"z₁"],[b,"z₂"],[c,"z₃"]].filter(([e])=>e>0).map(([e,n])=>n+(e>1?sup(e):"")).join("");
+  const shown=CM.mons.filter(m=>m[3]&&m[0]+m[1]+m[2]===CM.deg).slice(0,3).map(([a,b,c,co])=>`${co}·${mono(a,b,c)}`).join(" + ");
+  $("cm-poly").textContent=`P has ${CM.mons.length} terms up to total degree ${CM.deg}, e.g. ${shown} + …  Phase ω = ${OMEGA}, since ${OMEGA}⁸ = 1 mod 257.`;
+  $("cm-log").innerHTML=CM.rows.map(([i,wi,s,pv,acc])=>`<tr><td>${i}</td><td>${wi}</td><td>(${s.join(", ")})</td><td>${pv}</td><td>${acc}</td></tr>`).join("")||`<tr><td colspan="5" style="text-align:left" class="mut">No phases run yet. Press Next phase.</td></tr>`;
+  const truth=evalP(CM.v),once=evalP(CM.orig.map((x,k)=>(x+CM.v[k])%P));
+  let h=`<span>Direct P(v) = <b class="mono">${truth}</b></span><span class="mut">One evaluation on the occupied paper, P(x̂ + v) = <span class="mono">${once}</span>: wrong, the junk is in it.</span>`;
+  if(CM.done){const res=CM.acc*inv(M)%P;const okR=res===truth,okB=CM.regs.every((x,k)=>x===CM.orig[k]);
+    h+=`<span class="${okR?"ok":"bad"}">Sum ÷ 8 = <b class="mono">${res}</b>: ${okR?"equals P(v) exactly.":"does not equal P(v). Degree "+CM.deg+" ≥ 8, so junk⁸ gets phase ω⁸ⁱ = 1 and never cancels."}</span>`;
+    h+=`<span class="${okB?"ok":"bad"}">Borrowed registers ${okB?"handed back unchanged: "+CM.orig.join(", "):"changed"}.</span>`;}
+  else h+=`<span class="mut">Phase ${CM.i} of 8.</span>`;
+  $("cm-verdict").innerHTML=h;
+  drawWheel();
+}
+const wc=$("wheel"),wx=wc.getContext("2d");
+function drawWheel(){const C=css();wx.clearRect(0,0,240,240);const cx=120,cy=120,r=96;
+  wx.strokeStyle=C.line;wx.lineWidth=2;wx.beginPath();wx.arc(cx,cy,r,0,2*Math.PI);wx.stroke();
+  for(let i=0;i<M;i++){const a=i/M*2*Math.PI-Math.PI/2;const done=i<CM.i,cur=i===CM.i-1;
+    wx.strokeStyle=cur?C.accent:(done?C.ink:C.line);wx.lineWidth=cur?6:3;wx.beginPath();wx.moveTo(cx,cy);wx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);wx.stroke();
+    wx.fillStyle=cur?C.accent:(done?C.ink:C.muted);wx.font=`22px ${C.mono}`;wx.textAlign="center";wx.textBaseline="middle";
+    wx.fillText(String(i),cx+Math.cos(a)*(r+0),cy+Math.sin(a)*(r+0)-0);}
+  wx.fillStyle=C.surface;wx.beginPath();wx.arc(cx,cy,30,0,2*Math.PI);wx.fill();
+  wx.fillStyle=C.ink;wx.font=`600 20px ${C.mono}`;wx.fillText(CM.done?"Σ":"ωⁱ",cx,cy);}
+bindRange("rng-deg","o-deg",v=>{CM.deg=v;},null);
+$("rng-deg").addEventListener("input",()=>{cmBuild();cmRender();});
+$("cm-step").addEventListener("click",()=>{cmStep();cmRender();});
+$("cm-run").addEventListener("click",()=>{while(!CM.done)cmStep();cmRender();});
+$("cm-new").addEventListener("click",()=>{CM.seed++;cmBuild();cmRender();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>drawWheel());
+new MutationObserver(()=>drawWheel()).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+/* ---------- boot ---------- */
+sizeCanvas();rebuild(false);resetRings(true);pos=0;for(let l=0;l<=S.L;l++)lastIdx[l]=combCell(l);
+$("btn-play").textContent=playing?"Pause":"Spin";
+cmBuild();cmRender();
+requestAnimationFrame(frame);
+window.__comb={S,W:()=>W,ref:()=>ref,input,cut,startRegrow,regrowStep,R:()=>R,setMode,CM,cmBuild,cmStep,evalP,inv,M,P};
+})();
+</script>
+
+</body></html>
